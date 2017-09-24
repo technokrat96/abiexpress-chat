@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <textarea rows="10" cols="50" id="chat"></textarea>
+        <div id="list"></div>
+    </body>
+    <script src="./jquery-3.1.1.js"></script>
+    <script src="./RTCMultiConnection.min.js"></script>
+    <script src="./socket.io.js"></script>
+    <script>
+        var connection = new RTCMultiConnection();
+        connection.socketURL = "http://localhost:9001/";
+        connection.onmessage = function(ev){
+            console.log(ev);
+        };
+        connection.onstreamended = function(ev){
+            console.log(ev);
+        };
+        connection.onstream = function(ev){
+            console.log(ev);
+        };
+        connection.extra = {
+            type: 'clients',
+            id: "2",
+            name: "dsa"
+        };
+
+        connection.session = {
+            data: true,
+            audio: false,
+            video: false
+        };
+        (function looper() {
+            // connection.getPublicModerators(startsWith, callback)
+            connection.getPublicModerators(function(array) {
+                console.log(array);
+                $("#list").empty();
+                // publicRoomsDiv.innerHTML = '';
+                array.forEach(function(moderator) {
+                    // moderator.userid
+                    // moderator.extra
+                    if(moderator.userid == connection.userid) return; // if owner himself
+                    var li = document.createElement('li');
+                    li.innerHTML = '<b>' + moderator.userid + '</b>&nbsp;&nbsp;';
+                    var button = document.createElement('button');
+                    button.id = moderator.userid;
+                    button.onclick = function() {
+                        this.disabled = true;
+                        connection.join(this.id);
+                    };
+                    button.innerHTML = 'Join this room';
+                    li.appendChild(button);
+                    if(moderator.userid == connection.sessionid) {
+                        button.disabled = true;
+                    }
+                    $("#list").append(li);
+                });
+                setTimeout(looper, 3000);
+            });
+        })();
+        // connection.checkPresence("server", function(isRoomExist, roomid) {
+        //     console.log(isRoomExist);
+        //     console.log(roomid);
+        //     if (isRoomExist === true) {
+        //         connection.join(roomid);
+        //     } else {
+        //         alert("Maaf belum ada kelas yang sudah dibuka");
+        //     }
+        // });
+        $("#chat").on("keyup", function(ev){
+            if(ev.keyCode == "13"){
+                connection.send($(this).val());
+                $(this).val("");
+            }
+        });
+    </script>
+</html>

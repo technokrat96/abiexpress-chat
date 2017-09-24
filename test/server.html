@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        
+    </body>
+    <script src="./jquery-3.1.1.js"></script>
+    <script src="./RTCMultiConnection.min.js"></script>
+    <script src="./socket.io.js"></script>
+    <script>
+        var connection = new RTCMultiConnection();
+        connection.socketURL = "http://localhost:9001/";
+        connection.onmessage = function(ev){
+            console.log(ev);
+        };
+        connection.onstreamended = function(ev){
+            console.log(ev);
+        };
+        connection.onstream = function(ev){
+            console.log(ev);
+        };
+
+        connection.extra = {
+            type: 'members',
+            id: "1",
+            name: "asd"
+        };
+
+        connection.session = {
+            data: true,
+            audio: false,
+            video: false
+        };
+        connection.checkPresence("server", function(isRoomExist, roomid) {
+            if (isRoomExist === true) {
+                alert("MAAF KELAS DAN MATA PELAJARAN INI TIDAK ADA JAM STREAMING");
+            } else {
+                connection.open(roomid, true);
+            }
+        });
+    </script>
+</html>
