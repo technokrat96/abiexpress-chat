@@ -13,7 +13,7 @@
     <script src="./socket.io.js"></script>
     <script>
         var connection = new RTCMultiConnection();
-        connection.socketURL = "http://localhost:9001/";
+        connection.socketURL = "https://abiexpress-chatting.herokuapp.com/";
         connection.onmessage = function(ev){
             console.log(ev);
         };
